@@ -81,14 +81,13 @@ docs_es = list(nlp_es.pipe(t_esp))
 # Aquí se produce el preprocesado de todos los textos en español.
 tokens = []
 for count, doc in enumerate(docs_es, start=1):
-    # Si dividimos los textos por frases y después tokenizamos encontramos que existen ciertos
     print(f'DOCUMENTO Nº {count} en español')
-    tokens.append([token.text for token in doc])
+    # Tokenizamos los textos para encontrar los distintos tokens existentes en cada uno de ellos.
+    # Añadimos los tokens de cada texto a una nueva lista conformando una lista de listas
+    # Evitamos añadir los signos de puntuación a nuestra nueva lista
+    tokens.append([token.text for token in doc if not token.is_punct])
+
 print(tokens)
-    # for sents in doc.sents:
-    #     for token in sents:
-    #
-            #print(tokens.text)
 
 # Si lo evaluamos sobre la métrica dada debemos agrupar nuestros textos en español en 6 grupos.
 # Con la distancia coseno podemos evaluar dicha métrica
