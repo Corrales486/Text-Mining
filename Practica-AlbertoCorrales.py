@@ -84,8 +84,9 @@ for count, doc in enumerate(docs_es, start=1):
     print(f'DOCUMENTO Nº {count} en español')
     # Tokenizamos los textos para encontrar los distintos tokens existentes en cada uno de ellos.
     # Añadimos los tokens de cada texto a una nueva lista conformando una lista de listas
-    # Evitamos añadir los signos de puntuación a nuestra nueva lista
-    tokens.append([token.text for token in doc if not token.is_punct])
+    # Evitamos los saltos de línea así como los posibles espacios en nuestros tokens.
+    # Ahora evitamos añadir los signos de puntuación a nuestra nueva lista.
+    tokens.append([token.text.strip() for token in doc if not token.is_punct])
 
 print(tokens)
 
