@@ -65,7 +65,7 @@ if __name__ == "__main__":
     # Ya están todos los textos en texts_raw. Por tanto los proceso a todos ellos
     docs = list(nlp.pipe(texts_raw))
     for doc in docs:
-        tokens = [token.text for token in doc if not token.is_punct]
+        tokens = [token.text for token in doc if not token.is_stop and not token.is_punct]
 
         texts.append(tokens)
 
