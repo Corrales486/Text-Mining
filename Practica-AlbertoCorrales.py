@@ -87,7 +87,7 @@ for count, doc in enumerate(docs_es, start=1):
     # Evitamos los saltos de línea así como los posibles espacios en nuestros tokens.
     # Ahora evitamos añadir los signos de puntuación a nuestra nueva lista.
     # Tampoco añadimos los stopwords a nuestra lista de palabras.
-    tokens.append([token.text.strip() for token in doc if not token.is_punct and not token.is_stop])
+    tokens.append([token.lemma_.strip() for token in doc if not token.is_punct and not token.is_stop])
 
 print(tokens)
 
