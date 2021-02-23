@@ -58,7 +58,9 @@ def cluster_texts_es(texts, clustersNumber, distance):
     ### And here we actually call the function and create our array of vectors.
     vectors = [numpy.array(TF(f,unique_terms, collection)) for f in texts]
     print("Vectors created.")
-
+    # vectorizer = TfidfVectorizer()
+    # x = vectorizer.fit_transform(tokens)
+    # print(X)
     # initialize the clusterer
     clusterer = AgglomerativeClustering(n_clusters=clustersNumber, linkage="average", affinity=distanceFunction)
     clusters = clusterer.fit_predict(vectors)
@@ -77,9 +79,12 @@ def TF(document, unique_terms, collection):
 # INICIO PREPROCESAMIENTO ESPAÑOL
 
 
+
+
 docs_es = list(nlp_es.pipe(t_esp))
 # Aquí se produce el preprocesado de todos los textos en español.
 tokens = []
+
 for count, doc in enumerate(docs_es, start=1):
     print(f'DOCUMENTO Nº {count} en español')
     # Tokenizamos los textos para encontrar los distintos tokens existentes en cada uno de ellos.
@@ -87,9 +92,18 @@ for count, doc in enumerate(docs_es, start=1):
     # Evitamos los saltos de línea así como los posibles espacios en nuestros tokens.
     # Ahora evitamos añadir los signos de puntuación a nuestra nueva lista.
     # Tampoco añadimos los stopwords a nuestra lista de palabras.
-    tokens.append([token.lemma_.strip() for token in doc if not token.is_punct and not token.is_stop])
+    # Evitando los stopwords y los signos de puntuación sacamos los lemas de las distintas palabras.
+    # Únicamente añadimos los verbos y los adjetivos para demostrar que los Nombres son las categorías
+    # más importantes a la hora de categorizar los textos.
+    tokens.append([token.lemma_.strip() for token in doc if not token.is_punct and not token.is_stop
+                   and (token.pos_ == 'ADJ' or token.pos_ == 'VBO')])
 
-print(tokens)
+
+    for token in doc:
+        if not token.is_punct and not token.is_stop and (token.pos_ == 'ADJ' or token.pos_ == 'VBO'):
+            print(token, token.pos_)
+
+#print(tokens)
 
 # Si lo evaluamos sobre la métrica dada debemos agrupar nuestros textos en español en 6 grupos.
 # Con la distancia coseno podemos evaluar dicha métrica
@@ -109,3 +123,34 @@ print("reference: ", reference_esp)
 
 # Evaluation
 print("rand_score: ", adjusted_rand_score(reference_esp,test_esp))
+
+
+
+# nlp_es.vocab['a'].is_stop = True
+# nlp_es.vocab['y'].is_stop = True
+# nlp_es.vocab['o'].is_stop = True
+
+
+# EXPRESIONES REGULARES.
+# Buscar palabras que al realizar su extracción con Beautiful Soup se han quedado unidas cuando deberían estar
+# separadas por un punto.
+
+# expression = r"[a-z]+[A-Z]{1}[a-z\u00E0-\u00FC]"
+# # substitucion = r'\g<0>' # Se queda con todo el texto encontrado
+#
+# substitucion = r'\g<0>' # Se queda sólo con el patrón encontrado
+# #substitucion = r"[a-z]+[.][A-Z]{1}"
+# # Existen tokens que están mezclados con otros. Por ejemplo mesTe, disponiblesLa
+# texto = re.sub(expression, substitucion, texto)
+#
+# # print(texto)
+
+# expression = r"[a-z]+[A-Z]{1}"
+# # Existen tokens que están mezclados con otros. Por ejemplo mesTe, disponiblesLa
+# for token in doc:
+#     if re.search(expression, token.text):
+#         patron = re.split("\s+|([A-Z][a-z\u00E0-\u00FC]+)", token.text)
+#         print(patron)
+
+# x = re.finditer(expression, tokens)  # Busca el patron dentro del texto
+# print(x.span())
