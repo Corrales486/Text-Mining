@@ -100,7 +100,10 @@ for count, doc in enumerate(docs_es, start=1):
                         or token.pos_ == 'VBO')])
 
 
-
+    for token in doc:
+        if not token.is_punct and not token.is_stop and\
+                (token.pos_ == 'PROPN' or token.pos_ == 'NOUN' or token.pos_ == 'ADJ' or token.pos_ == 'VBO'):
+            print(token, token.pos_)
 
 #print(tokens)
 
