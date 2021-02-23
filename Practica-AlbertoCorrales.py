@@ -42,11 +42,82 @@ for count, file in enumerate(listing, start=1):
 
 print(f'Nº textos inglés: {len(t_en)} \nNº textos español: {len(t_esp)}')
 
-# Se empieza a realizar distintos preprocesados.
+# # Se empieza a realizar distintos preprocesados.
+#
+# # PREPROCESADO TEXTOS EN ESPAÑOL
+#
+# def cluster_texts_es(texts, clustersNumber, distance):
+#     #Load the list of texts into a TextCollection object.
+#     collection = nltk.TextCollection(texts)
+#     print("Created a collection of", len(collection), "terms.")
+#
+#     #get a list of unique terms
+#     unique_terms = list(set(collection))
+#     print("Unique terms found: ", len(unique_terms))
+#
+#     ### And here we actually call the function and create our array of vectors.
+#     vectors = [numpy.array(TF(f,unique_terms, collection)) for f in texts]
+#     print("Vectors created.")
+#     # vectorizer = TfidfVectorizer()
+#     # x = vectorizer.fit_transform(tokens)
+#     # print(X)
+#     # initialize the clusterer
+#     clusterer = AgglomerativeClustering(n_clusters=clustersNumber, linkage="average", affinity=distanceFunction)
+#     clusters = clusterer.fit_predict(vectors)
+#
+#     return clusters
+#
+# # Function to create a TF vector for one document. For each of
+# # our unique words, we have a feature which is the tf for that word
+# # in the current document
+# def TF(document, unique_terms, collection):
+#     word_tf = []
+#     for word in unique_terms:
+#         word_tf.append(collection.tf(word, document))
+#     return word_tf
+#
+# # INICIO PREPROCESAMIENTO ESPAÑOL
+#
+# docs_es = list(nlp_es.pipe(t_esp))
+# # Aquí se produce el preprocesado de todos los textos en español.
+# tokens_esp = []
+#
+# for count, doc in enumerate(docs_es, start=1):
+#     print(f'DOCUMENTO Nº {count} en español')
+#     for ent in doc.ents:
+#         print(ent.text, ent.label_)
+#
+#     tokens_esp.append([ent.text for ent in doc.ents])
+#     # Lo añadimos a la lista tokens para no cambiar el procesamiento que realiza posteriormente.
+#
+# print(tokens_esp)
+#
+# # Si lo evaluamos sobre la métrica dada debemos agrupar nuestros textos en español en 6 grupos.
+# # Con la distancia coseno podemos evaluar dicha métrica
+# distanceFunction ="cosine"
+# #distanceFunction = "euclidean"
+# test_esp = cluster_texts_es(tokens_esp,6,distanceFunction)
+# print("test: ", test_esp)
+# # Gold Standard
+# # 0 activista Loujain
+# # 1 accidente Alonso
+# # 2 Icautación cocaína
+# # 3 Rescate cubanos
+# # 4 Gobierno de Italia
+# # 5 Elecciones Ecuador
+# reference_esp =[0, 0, 1, 1, 2, 3, 4, 4, 4, 5, 5, 5, 2, 0, 3, 3]
+# print("reference: ", reference_esp)
+#
+# # Evaluation
+# print("rand_score: ", adjusted_rand_score(reference_esp,test_esp))
 
-# PREPROCESADO TEXTOS EN ESPAÑOL
 
-def cluster_texts_es(texts, clustersNumber, distance):
+# PROCESAMIENTO EN INGLÉS.
+# Llamamos a las mismas funciones, pero para los textos en inglés.
+# Se comenta las soluciones sacadas en Español para agilizar el proceso a la hora de evaluar los textos
+# en inglés
+
+def cluster_texts_en(texts, clustersNumber, distance):
     #Load the list of texts into a TextCollection object.
     collection = nltk.TextCollection(texts)
     print("Created a collection of", len(collection), "terms.")
@@ -76,40 +147,58 @@ def TF(document, unique_terms, collection):
         word_tf.append(collection.tf(word, document))
     return word_tf
 
-# INICIO PREPROCESAMIENTO ESPAÑOL
+# INICIO PREPROCESAMIENTO INGLÉS
 
-docs_es = list(nlp_es.pipe(t_esp))
-# Aquí se produce el preprocesado de todos los textos en español.
-tokens_esp = []
+docs_en = list(nlp_en.pipe(t_en))
+# Aquí se produce el preprocesado de todos los textos en inglés.
+tokens_en = []
 
-for count, doc in enumerate(docs_es, start=1):
-    print(f'DOCUMENTO Nº {count} en español')
-    for ent in doc.ents:
-        print(ent.text, ent.label_)
+for count, doc in enumerate(docs_en, start=1):
+    print(f'DOCUMENTO Nº {count} en inglés')
+    # Se tokeniza los textos para encontrar los distintos tokens en ellos.
+    # Se añaden los tokens de cada texto a una lista.
+    # En cada token se evitan los saltos de línea así como los posibles espacios entre los tokens.
+    tokens_en.append([token.text.strip() for token in doc])
 
-    tokens_esp.append([ent.text for ent in doc.ents])
-    # Lo añadimos a la lista tokens para no cambiar el procesamiento que realiza posteriormente.
-
-print(tokens_esp)
+print(tokens_en)
 
 # Si lo evaluamos sobre la métrica dada debemos agrupar nuestros textos en español en 6 grupos.
 # Con la distancia coseno podemos evaluar dicha métrica
 distanceFunction ="cosine"
 #distanceFunction = "euclidean"
-test_esp = cluster_texts_es(tokens_esp,6,distanceFunction)
-print("test: ", test_esp)
+test_en = cluster_texts_en(tokens_en,3,distanceFunction)
+print("test: ", test_en)
 # Gold Standard
-# 0 activista Loujain
-# 1 accidente Alonso
-# 2 Icautación cocaína
-# 3 Rescate cubanos
-# 4 Gobierno de Italia
-# 5 Elecciones Ecuador
-reference_esp =[0, 0, 1, 1, 2, 3, 4, 4, 4, 5, 5, 5, 2, 0, 3, 3]
-print("reference: ", reference_esp)
+# 0 accidente Alonso
+# 1 activista Loujain
+# 2 Wall Mexico
+
+reference_en =[0, 0, 2, 1, 1, 1, 2, 2]
+print("reference: ", reference_en)
 
 # Evaluation
-print("rand_score: ", adjusted_rand_score(reference_esp,test_esp))
+print("rand_score: ", adjusted_rand_score(reference_en,test_en))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
