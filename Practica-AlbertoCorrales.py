@@ -87,23 +87,11 @@ tokens = []
 
 for count, doc in enumerate(docs_es, start=1):
     print(f'DOCUMENTO Nº {count} en español')
-    # Tokenizamos los textos para encontrar los distintos tokens existentes en cada uno de ellos.
-    # Añadimos los tokens de cada texto a una nueva lista conformando una lista de listas
-    # Evitamos los saltos de línea así como los posibles espacios en nuestros tokens.
-    # Ahora evitamos añadir los signos de puntuación a nuestra nueva lista.
-    # Tampoco añadimos los stopwords a nuestra lista de palabras.
-    # Evitando los stopwords y los signos de puntuación sacamos los lemas de las distintas palabras.
-    # Añadimos a los verbos y adjetivos los Nombres para demostrar que son las categorías
-    # más importantes a la hora de clasificar los textos en clusters.
-    tokens.append([token.lemma_.strip() for token in doc if not token.is_punct and not token.is_stop
-                   and (token.pos_ == 'PROPN' or token.pos_ == 'NOUN' or token.pos_ == 'ADJ'
-                        or token.pos_ == 'VBO')])
+    for ent in doc.ents:
+        print(ent.text, ent.label_)
 
-
-    for token in doc:
-        if not token.is_punct and not token.is_stop and\
-                (token.pos_ == 'PROPN' or token.pos_ == 'NOUN' or token.pos_ == 'ADJ' or token.pos_ == 'VBO'):
-            print(token, token.pos_)
+    tokens.append([ent.text for ent in doc.ents])
+    # Lo añadimos a la lista tokens para no cambiar el procesamiento que realiza posteriormente.
 
 print(tokens)
 
