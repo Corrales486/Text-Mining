@@ -156,15 +156,10 @@ tokens_en = []
 
 for count, doc in enumerate(docs_en, start=1):
     print(f'DOCUMENTO Nº {count} en inglés')
-    # Se tokeniza los textos para encontrar los distintos tokens en ellos.
-    # Se añaden los tokens de cada texto a una lista.
-    # En cada token se evitan los saltos de línea así como los posibles espacios entre los tokens.
-    # Se produce la eliminación de los signos de puntuación para reducir la cantidad de vocabulario
-    # Realizamos el análisi morfológico añadiendo los verbos y adjetivos así como las palabras con mayor
-    # carga informativa como son los sustantivos.
-    tokens_en.append([token.lemma_.strip() for token in doc if not token.is_punct and not token.is_stop
-                      and (token.pos_ == 'ADJ' or token.pos_ == 'VBO'
-                           or token.pos_ == 'PROPN' or token.pos_ == 'NOUN')])
+    for ent in doc.ents:
+        print(ent.text, ent.label_)
+    tokens_en.append([ent.text for ent in doc.ents])
+    # Añadimos las Entity Names a una lista llamadas tokens para no tener que cambiar todo el procesamiento
 
 print(tokens_en)
 
