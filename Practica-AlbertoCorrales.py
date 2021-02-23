@@ -160,7 +160,9 @@ for count, doc in enumerate(docs_en, start=1):
     # Se añaden los tokens de cada texto a una lista.
     # En cada token se evitan los saltos de línea así como los posibles espacios entre los tokens.
     # Se produce la eliminación de los signos de puntuación para reducir la cantidad de vocabulario
-    tokens_en.append([token.lemma_.strip() for token in doc if not token.is_punct and not token.is_stop])
+    # Realizamos el análisi morfológico únicamente añadiendo los verbos y adjetivos.
+    tokens_en.append([token.lemma_.strip() for token in doc if not token.is_punct and not token.is_stop
+                      and (token.pos_ == 'ADJ' or token.pos_ == 'VBO')])
 
 print(tokens_en)
 
