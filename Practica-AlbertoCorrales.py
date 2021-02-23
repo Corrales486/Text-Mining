@@ -93,14 +93,16 @@ for count, doc in enumerate(docs_es, start=1):
     # Ahora evitamos añadir los signos de puntuación a nuestra nueva lista.
     # Tampoco añadimos los stopwords a nuestra lista de palabras.
     # Evitando los stopwords y los signos de puntuación sacamos los lemas de las distintas palabras.
-    # Únicamente añadimos los verbos y los adjetivos para demostrar que los Nombres son las categorías
-    # más importantes a la hora de categorizar los textos.
+    # Añadimos a los verbos y adjetivos los Nombres para demostrar que son las categorías
+    # más importantes a la hora de clasificar los textos en clusters.
     tokens.append([token.lemma_.strip() for token in doc if not token.is_punct and not token.is_stop
-                   and (token.pos_ == 'ADJ' or token.pos_ == 'VBO')])
+                   and (token.pos_ == 'PROPN' or token.pos_ == 'NOUN' or token.pos_ == 'ADJ'
+                        or token.pos_ == 'VBO')])
 
 
     for token in doc:
-        if not token.is_punct and not token.is_stop and (token.pos_ == 'ADJ' or token.pos_ == 'VBO'):
+        if not token.is_punct and not token.is_stop and\
+                (token.pos_ == 'PROPN' or token.pos_ == 'NOUN' or token.pos_ == 'ADJ' or token.pos_ == 'VBO'):
             print(token, token.pos_)
 
 #print(tokens)
