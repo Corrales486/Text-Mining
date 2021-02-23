@@ -105,7 +105,7 @@ for count, doc in enumerate(docs_es, start=1):
                 (token.pos_ == 'PROPN' or token.pos_ == 'NOUN' or token.pos_ == 'ADJ' or token.pos_ == 'VBO'):
             print(token, token.pos_)
 
-#print(tokens)
+print(tokens)
 
 # Si lo evaluamos sobre la métrica dada debemos agrupar nuestros textos en español en 6 grupos.
 # Con la distancia coseno podemos evaluar dicha métrica
