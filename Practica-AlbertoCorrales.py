@@ -78,28 +78,25 @@ def TF(document, unique_terms, collection):
 
 # INICIO PREPROCESAMIENTO ESPAÑOL
 
-
-
-
 docs_es = list(nlp_es.pipe(t_esp))
 # Aquí se produce el preprocesado de todos los textos en español.
-tokens = []
+tokens_esp = []
 
 for count, doc in enumerate(docs_es, start=1):
     print(f'DOCUMENTO Nº {count} en español')
     for ent in doc.ents:
         print(ent.text, ent.label_)
 
-    tokens.append([ent.text for ent in doc.ents])
+    tokens_esp.append([ent.text for ent in doc.ents])
     # Lo añadimos a la lista tokens para no cambiar el procesamiento que realiza posteriormente.
 
-print(tokens)
+print(tokens_esp)
 
 # Si lo evaluamos sobre la métrica dada debemos agrupar nuestros textos en español en 6 grupos.
 # Con la distancia coseno podemos evaluar dicha métrica
 distanceFunction ="cosine"
 #distanceFunction = "euclidean"
-test_esp = cluster_texts_es(tokens,6,distanceFunction)
+test_esp = cluster_texts_es(tokens_esp,6,distanceFunction)
 print("test: ", test_esp)
 # Gold Standard
 # 0 activista Loujain
@@ -113,6 +110,8 @@ print("reference: ", reference_esp)
 
 # Evaluation
 print("rand_score: ", adjusted_rand_score(reference_esp,test_esp))
+
+
 
 
 
