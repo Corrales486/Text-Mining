@@ -149,6 +149,7 @@ def TF(document, unique_terms, collection):
 
 # INICIO PREPROCESAMIENTO INGLÉS
 
+
 docs_en = list(nlp_en.pipe(t_en))
 # Aquí se produce el preprocesado de todos los textos en inglés.
 tokens_en = []
@@ -158,7 +159,8 @@ for count, doc in enumerate(docs_en, start=1):
     # Se tokeniza los textos para encontrar los distintos tokens en ellos.
     # Se añaden los tokens de cada texto a una lista.
     # En cada token se evitan los saltos de línea así como los posibles espacios entre los tokens.
-    tokens_en.append([token.text.strip() for token in doc])
+    # Se produce la eliminación de los signos de puntuación para reducir la cantidad de vocabulario
+    tokens_en.append([token.text.strip() for token in doc if not token.is_punct])
 
 print(tokens_en)
 
