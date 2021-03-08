@@ -83,11 +83,29 @@ def TF(document, unique_terms, collection):
         word_tf.append(collection.tf(word, document))
     return word_tf
 
-# Al evaluar los 16 textos escritos en español únicamente, se deben dividir en 6 grupos.
+# 3.1 TOKENIZACIÓN.
 
+docs_es = list(nlp_es.pipe(t_esp))
+# Con esta función aplicamos el objeto nlp a todos los textos que conforman la lista de textos en
+# español y les aplica el pipeline de procesamiento a todos ellos.
+text_esp = []
+
+for count, doc in enumerate(docs_es, start=1):
+    # Recorremos todos los objetos doc creados, uno para cada texto
+    # También se puede comprobar la correcta forma del Gold standard.
+    #print(f'DOCUMENTO Nº {count} en español')
+    # Sacamos los tokens de cada texto y los añadimos a una lista creando para todos los textos en español
+    # una lista de listas. Evitamos los espacios a derecha e izquierda que puedan provocar que se determinen
+    # como palabras diferentes palabras que realmente son iguales.
+
+    text_esp.append([token.text.strip() for token in doc])
+
+print(text_esp)
+
+# Al evaluar los 16 textos escritos en español únicamente, se deben dividir en 6 grupos.
 distanceFunction ="cosine"
 
-test_esp = cluster_texts_es(t_esp,6,distanceFunction)
+test_esp = cluster_texts_es(text_esp,6,distanceFunction)
 print("test: ", test_esp)
 # Gold Standard
 # 0 activista Loujain
