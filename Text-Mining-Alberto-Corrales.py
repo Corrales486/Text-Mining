@@ -40,11 +40,11 @@ if __name__ == "__main__":
 # También visualizamos los textos para entender su estructura y su temática.
             text_det = TextBlob(raw)
             if text_det.detect_language() == 'en':
-                print(f'Texto número {count}\n{raw}')
+                #print(f'Texto número {count}\n{raw}')
                 t_en.append(raw)
             if text_det.detect_language() == 'es':
                 t_esp.append(raw)
-                print(f'Texto número {count}\n{raw}')
+                #print(f'Texto número {count}\n{raw}')
 
 
     # Así nos encontramos con dos listas una para textos en español y otra para textos en inglés.
@@ -52,6 +52,58 @@ if __name__ == "__main__":
     # Donde se cuentan con 16 textos en español y 8 textos en inglés.
     print("Podemos acceder a los textos en español t_esp[0] - t_esp[" + str(len(t_esp) - 1) + "]")
     print("They can be accessed using t_en[0] - t_en[" + str(len(t_en) - 1) + "]")
+
+# 3. PROCESAMIENTOS TEXTOS EN ESPAÑOL.
+# Se utilizan las funciones originales del código para calcular el TF así como realizar el clustering.
+
+def cluster_texts_es(texts, clustersNumber, distance):
+    #Load the list of texts into a TextCollection object.
+    collection = nltk.TextCollection(texts)
+    print("Se ha creado una colección de", len(collection), "términos.")
+
+    #get a list of unique terms
+    unique_terms = list(set(collection))
+    print("Términos únicos textos en español: ", len(unique_terms))
+
+    ### And here we actually call the function and create our array of vectors.
+    vectors = [numpy.array(TF(f,unique_terms, collection)) for f in texts]
+    print("Vectores creados.")
+
+    clusterer = AgglomerativeClustering(n_clusters=clustersNumber, linkage="average", affinity=distanceFunction)
+    clusters = clusterer.fit_predict(vectors)
+
+    return clusters
+
+# Function to create a TF vector for one document. For each of
+# our unique words, we have a feature which is the tf for that word
+# in the current document
+def TF(document, unique_terms, collection):
+    word_tf = []
+    for word in unique_terms:
+        word_tf.append(collection.tf(word, document))
+    return word_tf
+
+# Al evaluar los 16 textos escritos en español únicamente, se deben dividir en 6 grupos.
+
+distanceFunction ="cosine"
+
+test_esp = cluster_texts_es(t_esp,6,distanceFunction)
+print("test: ", test_esp)
+# Gold Standard
+# 0 activista Loujain
+# 1 accidente Alonso
+# 2 Icautación cocaína
+# 3 Rescate cubanos
+# 4 Gobierno de Italia
+# 5 Elecciones Ecuador
+
+reference_esp =[0, 0, 1, 1, 2, 3, 4, 4, 4, 5, 5, 5, 2, 0, 3, 3]
+print("reference: ", reference_esp)
+
+# Evaluation
+print("rand_score: ", adjusted_rand_score(reference_esp,test_esp))
+
+
 
 '''
     texts = t_esp + t_en
