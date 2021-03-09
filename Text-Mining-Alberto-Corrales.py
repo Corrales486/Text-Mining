@@ -132,7 +132,12 @@ for count, doc in enumerate(docs_es, start=1):
 # 3.3 ELIMINACIÓN STOPWORDS
     # Se evita añadir las stopwords a nuestras lista de tokens ya que son términos muy frecuentes que pueden
     # provocar confusión a la hora de agrupar los textos en base a Term frequency
-    text_esp.append([token.text.strip() for token in doc if not token.is_punct and not token.is_stop])
+
+# 3.4 LEMATIZACIÓN
+    # El proceso de lematización consiste en sustituir las palabras por su raíz.
+    # Obteniendo todas aquellas palabras con la misma palabra raiz el mismo lema no importando
+    # ni tiempos verbales, ni género ni número.
+    text_esp.append([token.lemma_.strip() for token in doc if not token.is_punct and not token.is_stop])
 
 print(text_esp)
 
