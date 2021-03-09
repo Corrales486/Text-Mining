@@ -4,6 +4,8 @@ from sklearn.metrics.cluster import *
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.metrics.cluster import adjusted_rand_score
 from textblob import TextBlob
+from spacy.matcher import Matcher
+import unicodedata
 
 # Se añade la librería textblob para identificar el idioma de cada texto y poder dividirlos.
 
@@ -110,11 +112,12 @@ docs_es = list(nlp_es.pipe(t_esp))
 # español y les aplica el pipeline de procesamiento a todos ellos.
 text_esp = []
 
+
 for count, doc in enumerate(docs_es, start=1):
     # Recorremos todos los objetos doc creados, uno para cada texto
     # También se puede comprobar la correcta forma del Gold standard.
 
-    print(f'DOCUMENTO Nº {count} en español\n', doc)
+    #print(f'DOCUMENTO Nº {count} en español\n', doc)
 
     # Sacamos los tokens de cada texto y los añadimos a una lista creando para todos los textos en español
     # una lista de listas.
@@ -126,7 +129,10 @@ for count, doc in enumerate(docs_es, start=1):
     # Ahora además de seguir tokenizando nuestros documentos se evita incluir en nuestro lista de tokens
     # aquellos que sean signos de puntuación
 
-    text_esp.append([token.text.strip() for token in doc if not token.is_punct])
+# 3.3 ELIMINACIÓN STOPWORDS
+    # Se evita añadir las stopwords a nuestras lista de tokens ya que son términos muy frecuentes que pueden
+    # provocar confusión a la hora de agrupar los textos en base a Term frequency
+    text_esp.append([token.text.strip() for token in doc if not token.is_punct and not token.is_stop])
 
 print(text_esp)
 
