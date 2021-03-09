@@ -137,7 +137,24 @@ for count, doc in enumerate(docs_es, start=1):
     # El proceso de lematización consiste en sustituir las palabras por su raíz.
     # Obteniendo todas aquellas palabras con la misma palabra raiz el mismo lema no importando
     # ni tiempos verbales, ni género ni número.
-    text_esp.append([token.lemma_.strip() for token in doc if not token.is_punct and not token.is_stop])
+
+# 3.5 POS-TAGGING
+    # Las diferentes categorías gramaticales de un texto proporcionan distinta cantidad de información sobre dicho documento.
+    # Primero se comprueba si los verbos y adverbios recogen gran cantidad de información para
+    # realizar el agrupamiento de nuestros textos aunque se comprueba que no.
+
+    # text_esp.append([token.lemma_.strip() for token in doc if not token.is_punct and not token.is_stop
+    #                  and (token.pos_ == 'VERB' or token.pos_ == 'ADV')])
+
+    # La segunda comprobación muestra la cantidad de información que aportan los adjetivos para realizar el agrupamiento.
+    # comprobando como sí mejora el rendimiento de nuestro algoritmo
+    # text_esp.append([token.lemma_.strip() for token in doc if not token.is_punct and not token.is_stop
+    #                   and (token.pos_ == 'ADJ')])
+
+    # Por último se comprueba si son los sustantivos y nombres propios los que mayor cantidad de información
+    # aportan para diferenciar la temática de nuestros documentos.
+    text_esp.append([token.lemma_.strip() for token in doc if not token.is_punct and not token.is_stop
+                       and (token.pos_ == 'NOUN' or token.pos_ == 'PROPN' or token.pos_ == 'ADJ')])
 
 print(text_esp)
 
