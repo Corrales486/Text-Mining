@@ -4,8 +4,8 @@ from sklearn.metrics.cluster import *
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.metrics.cluster import adjusted_rand_score
 from textblob import TextBlob
-from spacy.matcher import Matcher
-import unicodedata
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
 
 # Se añade la librería textblob para identificar el idioma de cada texto y poder dividirlos.
 
@@ -153,8 +153,28 @@ for count, doc in enumerate(docs_es, start=1):
 
     # Por último se comprueba si son los sustantivos y nombres propios los que mayor cantidad de información
     # aportan para diferenciar la temática de nuestros documentos.
-    text_esp.append([token.lemma_.strip() for token in doc if not token.is_punct and not token.is_stop
-                       and (token.pos_ == 'NOUN' or token.pos_ == 'PROPN' or token.pos_ == 'ADJ')])
+    texto = [token.lemma_.strip() for token in doc if not token.is_punct and not token.is_stop
+     and (token.pos_ == 'NOUN' or token.pos_ == 'PROPN' or token.pos_ == 'ADJ')]
+
+    text_esp.append(texto)
+
+
+    # 3.6 WordCloud
+    # Una manera de mostrar gráficamente que palabras son las más frecuentes en nuestros textos es
+    # a través de las nubes de palabras las cuáles permiten observar si son los términos más informativos
+    # los más frecuentes en nuestros documentos.
+
+    print(f'DOCUMENTO Nº {count} en español con {len(texto)} términos, siendo únicos {len(set(texto))}')
+    texto_join = ' '.join(texto)
+
+    wordcloud = WordCloud(max_words=70, background_color="white", width=500,
+               height=500,random_state=42).generate(texto_join)
+
+    plt.figure(figsize=(30, 20))
+    plt.axis("off")
+    plt.imshow(wordcloud, interpolation='bilinear')
+    #plt.show()
+    wordcloud.to_file(f".\Texto-{count}español.png")
 
 print(text_esp)
 
