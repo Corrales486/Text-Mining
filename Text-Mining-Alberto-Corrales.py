@@ -121,8 +121,12 @@ for count, doc in enumerate(docs_es, start=1):
     # Evitamos los espacios a derecha e izquierda que puedan provocar que se determinen
     # como palabras diferentes palabras que realmente son iguales.
 
+# 3.2 ELIMINACIÓN  SIGNOS DE PUNTUACIÓN
 
-    text_esp.append([token.text.strip() for token in doc])
+    # Ahora además de seguir tokenizando nuestros documentos se evita incluir en nuestro lista de tokens
+    # aquellos que sean signos de puntuación
+
+    text_esp.append([token.text.strip() for token in doc if not token.is_punct])
 
 print(text_esp)
 
