@@ -83,6 +83,26 @@ def TF(document, unique_terms, collection):
         word_tf.append(collection.tf(word, document))
     return word_tf
 
+# 3.1.1 TOKENIZACIÓN ERRÓNEA
+# Spacy permite modificar y añadir nuevos conjuntos de reglas a las ya existentes.
+# Al haber caracteres especiales o palabras importantes que no habían sido correctamente identificadas.
+# Se decide modificar este conjunto de reglas para mejorar la tokenización de nuestros textos.
+
+prefixes_es = nlp_es.Defaults.prefixes + ("", "", "", "","¡", "¿", "«",'"',"-", "\.","Ecuador", "Draghi", "europeísta", "85%", "15,98%",
+                                       "15%", "populista", "Internacional", "intereses", "disponibles", "Corresponsal", "empresas",)
+prefix_regex_es = spacy.util.compile_prefix_regex(prefixes_es)
+nlp_es.tokenizer.prefix_search = prefix_regex_es.search
+
+suffixes = nlp_es.Defaults.suffixes + ["", "", "", "", "", "", "»", "/", '"', "    ", "-", "La", "Ausentismo", "Internacional",
+                                       "Agentes","Mario", "Máster", "Traficar", "Descubre", 'Suscríbete', "Necesitamos", "Vivimos", "Te",]
+suffix_regex = spacy.util.compile_suffix_regex(suffixes)
+nlp_es.tokenizer.suffix_search = suffix_regex.search
+
+infixes = nlp_es.Defaults.infixes + [r"\.", "", "", "\?","¿", '"', "!", "¡","   ", "\(", "\)", "\)-",]
+infix_regex = spacy.util.compile_infix_regex(infixes)
+nlp_es.tokenizer.infix_finditer = infix_regex.finditer
+
+
 # 3.1 TOKENIZACIÓN.
 
 docs_es = list(nlp_es.pipe(t_esp))
@@ -93,10 +113,14 @@ text_esp = []
 for count, doc in enumerate(docs_es, start=1):
     # Recorremos todos los objetos doc creados, uno para cada texto
     # También se puede comprobar la correcta forma del Gold standard.
-    #print(f'DOCUMENTO Nº {count} en español')
+
+    print(f'DOCUMENTO Nº {count} en español\n', doc)
+
     # Sacamos los tokens de cada texto y los añadimos a una lista creando para todos los textos en español
-    # una lista de listas. Evitamos los espacios a derecha e izquierda que puedan provocar que se determinen
+    # una lista de listas.
+    # Evitamos los espacios a derecha e izquierda que puedan provocar que se determinen
     # como palabras diferentes palabras que realmente son iguales.
+
 
     text_esp.append([token.text.strip() for token in doc])
 
