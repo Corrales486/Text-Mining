@@ -8,8 +8,8 @@ from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 
 # Se añade la librería textblob para identificar el idioma de cada texto y poder dividirlos.
-
 import spacy
+from spacy.pipeline import EntityRuler
 
 # Se añade la librería spacy para realizar el procesamiento de los textos.
 # Se llama a los paquetes prentrenados de spacy tanto en español como en inglés.
@@ -104,6 +104,31 @@ infixes = nlp_es.Defaults.infixes + [r"\.", "", "", "\?","¿", '"', "!", "¡
 infix_regex = spacy.util.compile_infix_regex(infixes)
 nlp_es.tokenizer.infix_finditer = infix_regex.finditer
 
+ruler_es = EntityRuler(nlp_es, overwrite_ents=True) # Sobrescriba el patrón que le indicamos
+patterns_es = [{'label': 'PER', 'pattern':'Loujain al Hathloul'}, {'label': 'PER', 'pattern':'Loujain'},
+               {'label': 'ORG', 'pattern':'Twitter'}, {'label': 'PER', 'pattern':'Lina'},
+               {'label': 'PER', 'pattern':'Lina al Hathloul'}, {'label': 'PER', 'pattern':'Loujain Al Hathloul'},
+               {'label': 'PER', 'pattern':'Amina'},{'label': 'ORG', 'pattern':'Polícia Nacional'},
+               {'label': 'MISC', 'pattern':'IAB'}, {'label': 'MISC', 'pattern':'Usted'},
+               {'label': 'ORG', 'pattern':'MotoGP'}, {'label': 'ORG', 'pattern':'Mundial de Formula 1'},
+               {'label': 'ORG', 'pattern':'Alpine'}, {'label': 'PER', 'pattern':'Riccione'},
+               {'label': 'ORG', 'pattern':'Formula 1'}, {'label': 'MISC', 'pattern':'Regístrate'},
+               {'label': 'MISC', 'pattern':'William Hill'}, {'label': 'ORG', 'pattern':'Mundial de F1'},
+               {'label': 'MISC', 'pattern':'Hazte'}, {'label': 'LOC', 'pattern':'Campo de Gibraltar'},
+               {'label': 'ORG', 'pattern':'Guardia Civil'}, {'label': 'ORG', 'pattern':'Guardia Costera'},
+               {'label': 'PER', 'pattern':'Riley Beecher'}, {'label': 'ORG', 'pattern':'BCE'},
+               {'label': 'ORG', 'pattern':'Banco Central Europeo'}, {'label': 'ORG', 'pattern':'M5E'},
+               {'label': 'PER', 'pattern':'Draghi'}, {'label': 'PER', 'pattern':'Mario Draghi'},
+               {'label': 'PER', 'pattern':'Anna Buj'}, {'label': 'PER', 'pattern':'Yaku'},
+               {'label': 'PER', 'pattern':'Yaku Pérez'}, {'label': 'PER', 'pattern':'Rafael Correa'},
+               {'label': 'PER', 'pattern':'Andrés Arauz'}, {'label': 'PER', 'pattern':'Arauz'},
+               {'label': 'PER', 'pattern':'Vito Crimi'}, {'label': 'MISC', 'pattern':'Cable News Network'},
+               {'label': 'MISC', 'pattern':'CNN Sans'},{'label': 'MISC', 'pattern':'All Rights Reserved'},
+               {'label': 'PER', 'pattern':'Correa'},{'label': 'LOC', 'pattern':'Ecuador'}]
+# Especificamos los distintos patrones que queremos ejecutar
+ruler_es.add_patterns(patterns_es)
+# Le añadimos a nuestro Entity ruler los patrones que queremos buscar
+nlp_es.add_pipe(ruler_es, before='ner') # Le decimos donde tiene que ir nuestro patrón
 
 # 3.1 TOKENIZACIÓN.
 
@@ -153,10 +178,10 @@ for count, doc in enumerate(docs_es, start=1):
 
     # Por último se comprueba si son los sustantivos y nombres propios los que mayor cantidad de información
     # aportan para diferenciar la temática de nuestros documentos.
-    texto = [token.lemma_.strip() for token in doc if not token.is_punct and not token.is_stop
-     and (token.pos_ == 'NOUN' or token.pos_ == 'PROPN' or token.pos_ == 'ADJ')]
-
-    text_esp.append(texto)
+    # texto = [token.lemma_.strip() for token in doc if not token.is_punct and not token.is_stop
+    #  and (token.pos_ == 'NOUN' or token.pos_ == 'PROPN' or token.pos_ == 'ADJ')]
+    #
+    # text_esp.append(texto)
 
 
     # 3.6 WordCloud
@@ -164,17 +189,28 @@ for count, doc in enumerate(docs_es, start=1):
     # a través de las nubes de palabras las cuáles permiten observar si son los términos más informativos
     # los más frecuentes en nuestros documentos.
 
-    print(f'DOCUMENTO Nº {count} en español con {len(texto)} términos, siendo únicos {len(set(texto))}')
-    texto_join = ' '.join(texto)
+    #print(f'DOCUMENTO Nº {count} en español con {len(texto)} términos, siendo únicos {len(set(texto))}')
+    # texto_join = ' '.join(texto)
+    #
+    # wordcloud = WordCloud(max_words=70, background_color="white", width=500,
+    #            height=500,random_state=42).generate(texto_join)
+    #
+    # plt.figure(figsize=(30, 20))
+    # plt.axis("off")
+    # plt.imshow(wordcloud, interpolation='bilinear')
+    # #plt.show()
+    # wordcloud.to_file(f".\Texto-{count}español.png")
 
-    wordcloud = WordCloud(max_words=70, background_color="white", width=500,
-               height=500,random_state=42).generate(texto_join)
+    #3.7 ENTIDADES NOMBRADAS
+    # Las E.N son importantes a la hora de aporta información sobre la tematica de una noticia
+    # ya que pueden contener datos acerca del suceso o evento ocurrido, de los protagonistas así
+    # como de la localización donde se produjo.
 
-    plt.figure(figsize=(30, 20))
-    plt.axis("off")
-    plt.imshow(wordcloud, interpolation='bilinear')
-    #plt.show()
-    wordcloud.to_file(f".\Texto-{count}español.png")
+    entidades = [ents.text for ents in doc.ents if ents.label_ != 'MISC' ]
+    print(f'DOCUMENTO Nº {count} en español con {len(entidades)} entidades, siendo únicas {len(set(entidades))}')
+
+    text_esp.append(entidades)
+    entidades_join = ' '.join(entidades)
 
 print(text_esp)
 
