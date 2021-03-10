@@ -301,10 +301,14 @@ for count, doc in enumerate(docs_en, start=1):
     # una lista de listas.
     # Evitamos los espacios a derecha e izquierda que puedan provocar que se determinen
     # como palabras diferentes palabras que realmente son iguales.
-    for token in doc:
-        print(token.text)
 
-    text_en.append([token.text.strip() for token in doc])
+    # 4.3 ELIMINACIÓN SIGNOS DE PUNTUACIÓN Y STOPWORDS.
+
+    # Ahora además de seguir tokenizando nuestros documentos se evita incluir en nuestro lista de tokens
+    # aquellos que sean signos de puntuación y las stopwords a nuestras lista de tokens ya que son
+    # términos muy frecuentes que pueden provocar confusión a la hora de agrupar los textos en base a TF
+
+    text_en.append([token.text.strip() for token in doc if not token.is_punct and not token.is_stop])
 
 print(text_en)
 
