@@ -228,10 +228,82 @@ print("test: ", test_esp)
 # 5 Elecciones Ecuador
 
 reference_esp =[0, 0, 1, 1, 2, 3, 4, 4, 4, 5, 5, 5, 2, 0, 3, 3]
-print("reference: ", reference_esp)
+print("Reference español: ", reference_esp)
 
 # Evaluation
-print("rand_score: ", adjusted_rand_score(reference_esp,test_esp))
+print("Rand_score español: ", adjusted_rand_score(reference_esp,test_esp))
+
+
+# 4. PROCESAMIENTO TEXTOS INGLÉS
+# Contamos con 8 textos en inglés los cuáles están almacenados en t_en
+# Se siguen utilizando las funciones originales del código para calcular el TF así como realizar el clustering.
+
+def cluster_texts_en(texts, clustersNumber, distance):
+    #Load the list of texts into a TextCollection object.
+    collection = nltk.TextCollection(texts)
+    print("Created a collection of", len(collection), "terms.")
+
+    #get a list of unique terms
+    unique_terms = list(set(collection))
+    print("Unique terms found: ", len(unique_terms))
+
+    ### And here we actually call the function and create our array of vectors.
+    vectors = [numpy.array(TF(f,unique_terms, collection)) for f in texts]
+    print("Vectors created.")
+
+    # initialize the clusterer
+    clusterer = AgglomerativeClustering(n_clusters=clustersNumber, linkage="average", affinity=distanceFunction)
+    clusters = clusterer.fit_predict(vectors)
+
+    return clusters
+
+# Function to create a TF vector for one document. For each of
+# our unique words, we have a feature which is the tf for that word
+# in the current document
+def TF(document, unique_terms, collection):
+    word_tf = []
+    for word in unique_terms:
+        word_tf.append(collection.tf(word, document))
+    return word_tf
+
+docs_en = list(nlp_en.pipe(t_en))
+
+# Con esta función aplicamos el objeto nlp a todos los textos que conforman la lista de textos en
+# inglés y se les aplica el pipeline de procesamiento a todos ellos.
+
+text_en = []
+
+# 4.1 TOKENIZACIÓN.
+
+for count, doc in enumerate(docs_en, start=1):
+    # Recorremos todos los objetos doc creados, uno para cada texto
+
+    print(f'DOCUMENTO Nº {count} en inglés')
+
+    # Sacamos los tokens de cada texto y los añadimos a una lista creando para todos los textos en inglés
+    # una lista de listas.
+    # Evitamos los espacios a derecha e izquierda que puedan provocar que se determinen
+    # como palabras diferentes palabras que realmente son iguales.
+    text_en.append([token.text.strip() for token in doc])
+
+print(text_en)
+
+# Si lo evaluamos sobre la métrica dada debemos agrupar nuestros textos en inglés en 3 grupos.
+# Con la distancia coseno podemos evaluar dicha métrica
+distanceFunction ="cosine"
+#distanceFunction = "euclidean"
+test_en = cluster_texts_en(text_en,3,distanceFunction)
+print("test: ", test_en)
+# Gold Standard
+# 0 accidente Alonso
+# 1 activista Loujain
+# 2 Wall Mexico
+
+reference_en =[0, 0, 2, 1, 1, 1, 2, 2]
+print("Reference english: ", reference_en)
+
+# Evaluation
+print("Rand_score english: ", adjusted_rand_score(reference_en,test_en))
 
 
 
