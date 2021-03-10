@@ -295,7 +295,7 @@ text_en = []
 for count, doc in enumerate(docs_en, start=1):
     # Recorremos todos los objetos doc creados, uno para cada texto
 
-    print(f'DOCUMENTO Nº {count} en inglés')
+    #print(f'DOCUMENTO Nº {count} en inglés')
 
     # Sacamos los tokens de cada texto y los añadimos a una lista creando para todos los textos en inglés
     # una lista de listas.
@@ -319,8 +319,25 @@ for count, doc in enumerate(docs_en, start=1):
     # también los verbos y los adjetivo.
     # Al no poder mejorar la métrica de la agrupación se escogen los Nombres propios, sustantivos y adjetivos
     # en esta fase ya que fueron los que mejorar la agrupación en el procesamiento de textos en español.
-    text_en.append([token.lemma_.strip() for token in doc if not token.is_punct and not token.is_stop
-                    and (token.pos_ == 'NOUN' or token.pos_ == 'PROPN' or token.pos_ == 'ADJ')])
+    texto_en = [token.lemma_.strip() for token in doc if not token.is_punct and not token.is_stop
+     and (token.pos_ == 'NOUN' or token.pos_ == 'PROPN' or token.pos_ == 'ADJ')]
+    text_en.append(texto_en)
+    # 4.6 WordCloud
+    # Una manera de mostrar gráficamente que palabras son las más frecuentes en nuestros textos es
+    # a través de las nubes de palabras las cuáles permiten observar si son los términos más informativos
+    # los más frecuentes en nuestros documentos.
+
+    print(f'DOCUMENTO Nº {count} en inglés con {len(texto_en)} términos, siendo únicos {len(set(texto_en))}')
+    texto_en_join = ' '.join(texto_en)
+
+    wordcloud_en = WordCloud(max_words=70, background_color="white", width=500,
+               height=500,random_state=42).generate(texto_en_join)
+
+    plt.figure(figsize=(30, 20))
+    plt.axis("off")
+    plt.imshow(wordcloud_en, interpolation='bilinear')
+    #plt.show()
+    wordcloud_en.to_file(f".\Texto-{count}english.png")
 
 print(text_en)
 
