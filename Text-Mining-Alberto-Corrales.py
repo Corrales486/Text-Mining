@@ -313,7 +313,14 @@ for count, doc in enumerate(docs_en, start=1):
     # Obteniendo todas aquellas palabras con la misma palabra raiz el mismo lema no importando
     # ni tiempos verbales, ni género ni número.
 
-    text_en.append([token.lemma_.strip() for token in doc if not token.is_punct and not token.is_stop])
+    # 4.5 POS-TAGGING
+    # Como vimos anteriormente las diferentes categorías gramaticales proporcionan distinta cantidad
+    # de información siendo los Nombres propios y sustantivos los que mayor cantidad de información aportan
+    # también los verbos y los adjetivo.
+    # Al no poder mejorar la métrica de la agrupación se escogen los Nombres propios, sustantivos y adjetivos
+    # en esta fase ya que fueron los que mejorar la agrupación en el procesamiento de textos en español.
+    text_en.append([token.lemma_.strip() for token in doc if not token.is_punct and not token.is_stop
+                    and (token.pos_ == 'NOUN' or token.pos_ == 'PROPN' or token.pos_ == 'ADJ')])
 
 print(text_en)
 
