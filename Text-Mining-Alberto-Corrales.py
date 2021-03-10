@@ -266,6 +266,23 @@ def TF(document, unique_terms, collection):
         word_tf.append(collection.tf(word, document))
     return word_tf
 
+# 4.1.1 TOKENIZACIÓN MODIFICADA INGLÉS
+# Spacy permite modificar y añadir nuevos conjuntos de reglas a las ya existentes.
+
+
+prefixes_en = nlp_en.Defaults.prefixes + ('"',"Filters", "\.","Allowed", "", "", "", "", "", '"', "U.S.",)
+prefix_regex_en = spacy.util.compile_prefix_regex(prefixes_en)
+nlp_en.tokenizer.prefix_search = prefix_regex_en.search
+
+suffixes_en = nlp_en.Defaults.suffixes + ("Biden", "President", "Most", "Clear", "Different", "", "", "/",
+                                          "",'"', "-", "Emily","âre",)
+suffix_regex_en = spacy.util.compile_suffix_regex(suffixes_en)
+nlp_en.tokenizer.suffix_search = suffix_regex_en.search
+
+infixes_en = nlp_en.Defaults.infixes + ( r"\.", "/", "","", "","", "", "",r"\?",)
+infix_regex_en = spacy.util.compile_infix_regex(infixes_en)
+nlp_en.tokenizer.infix_finditer = infix_regex_en.finditer
+
 docs_en = list(nlp_en.pipe(t_en))
 
 # Con esta función aplicamos el objeto nlp a todos los textos que conforman la lista de textos en
@@ -284,6 +301,9 @@ for count, doc in enumerate(docs_en, start=1):
     # una lista de listas.
     # Evitamos los espacios a derecha e izquierda que puedan provocar que se determinen
     # como palabras diferentes palabras que realmente son iguales.
+    for token in doc:
+        print(token.text)
+
     text_en.append([token.text.strip() for token in doc])
 
 print(text_en)
