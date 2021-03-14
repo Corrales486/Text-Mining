@@ -211,7 +211,7 @@ for count, doc in enumerate(docs_es, start=1):
     # como de la localización donde se produjo.
 
     entidades = [ents.text.strip() for ents in doc.ents if ents.label_ != 'MISC']
-    print(f'DOCUMENTO Nº {count} en español con {len(entidades)} entidades, siendo únicas {len(set(entidades))}')
+    #print(f'DOCUMENTO Nº {count} en español con {len(entidades)} entidades, siendo únicas {len(set(entidades))}')
 
     text_esp.append(entidades)
 
@@ -351,7 +351,7 @@ for count, doc in enumerate(docs_en, start=1):
     # como de la localización donde se produjo.
 
     entidades = [ents.text.strip() for ents in doc.ents if not ents.text.isspace()]
-    print(f'DOCUMENTO Nº {count} en inglés cuenta con {len(entidades)} entidades, siendo únicas {len(set(entidades))}')
+    #print(f'DOCUMENTO Nº {count} en inglés cuenta con {len(entidades)} entidades, siendo únicas {len(set(entidades))}')
 
     text_en.append(entidades)
 
@@ -375,22 +375,24 @@ print("Reference english: ", reference_en)
 print("Rand_score english: ", adjusted_rand_score(reference_en,test_en))
 
 
+# 5 PROCESAMIENTO TEXTOS CONJUNTOS.
 
-'''
-    texts = t_esp + t_en
-    print(texts)
-    print("Prepared ", len(texts), " documents...")
-    print("They can be accessed using texts[0] - texts[" + str(len(texts)-1) + "]")
+# Se unen los términos sacados para los documento en los distintos procesamientos.
+texts = text_esp + text_en
+print(texts)
+print("Prepared ", len(texts), " documents...")
+# Se pueden acceder a las distintas listas de los documentos de la siguiente forma.
+print("They can be accessed using texts[0] - texts[" + str(len(texts)-1) + "]")
 
 
 def cluster_texts(texts, clustersNumber, distance):
     #Load the list of texts into a TextCollection object.
     collection = nltk.TextCollection(texts)
-    print("Created a collection of", len(collection), "terms.")
+    print("Created a total collection of", len(collection), "terms.")
 
     #get a list of unique terms
     unique_terms = list(set(collection))
-    print("Unique terms found: ", len(unique_terms))
+    print("Unique terms (All texts) found: ", len(unique_terms))
 
     ### And here we actually call the function and create our array of vectors.
     vectors = [numpy.array(TF(f,unique_terms, collection)) for f in texts]
@@ -414,24 +416,44 @@ def TF(document, unique_terms, collection):
 
 
 distanceFunction ="cosine"
-#distanceFunction = "euclidean"
+
 test = cluster_texts(texts,7,distanceFunction)
 print("test: ", test)
-# Gold Standard
+
+#Gold Standard Español
 # 0 activista Loujain
 # 1 accidente Alonso
-# 2 Muro frontera México
-# 3 Icautación cocaína
-# 4 Rescate cubanos
-# 5 Gobierno de Italia
-# 6 Elecciones Ecuador
-reference =[0, 0, 1, 1, 1, 1, 2, 3, 4, 5, 5, 5, 6, 6, 6, 3, 0, 0, 0, 4, 4, 0, 2, 2]
-print("reference: ", reference)
+# 2 Icautación cocaína
+# 3 Rescate cubanos
+# 4 Gobierno de Italia
+# 5 Elecciones Ecuador
+# reference_esp =[0, 0, 1, 1, 2, 3, 4, 4, 4, 5, 5, 5, 2, 0, 3, 3]
+
+# Gold Standard English
+# 0 accidente Alonso
+# 1 activista Loujain
+# 2 Wall Mexico
+# reference_en =[0, 0, 2, 1, 1, 1, 2, 2]
+
+# Gold Standar conjunto.
+# 0 activista Loujain
+# 1 accidente Alonso
+# 2 Icautación cocaína
+# 3 Rescate cubanos
+# 4 Gobierno de Italia
+# 5 Elecciones Ecuador
+# 6 Wall Mexico
+# Primero se coge el orden de los textos en español y se agregan los textos en inglés
+# Modificando el número asignado para que coincidan según temática.
+
+reference =[0, 0, 1, 1, 2, 3, 4, 4, 4, 5, 5, 5, 2, 0, 3, 3, 1, 1, 6, 0, 0, 0, 6, 6]
+
+print("Reference total: ", reference)
 
 # Evaluation
-print("rand_score: ", adjusted_rand_score(reference,test))
+print("Rand_score total: ", adjusted_rand_score(reference,test))
 
-'''
+
 
 
 
