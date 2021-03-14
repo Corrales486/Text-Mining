@@ -37,6 +37,10 @@ if __name__ == "__main__":
             url = folder + "/" + file
             f = open(url, encoding="latin-1", errors='ignore');
             raw = f.read()
+            raw = re.sub('\s', ' ', raw)
+            # Se apreció que al sacar las EN en Inglés surgían diversos problemas
+            # Ya que introducía como EN saltos de linea (\n) o \t
+            # Por ello se deciden eliminar para evitar ruido.
             f.close()
 # Evaluamos el idioma de cada texto y se añade a cada lista según se identifique.
 # También visualizamos los textos para entender su estructura y su temática.
@@ -206,11 +210,10 @@ for count, doc in enumerate(docs_es, start=1):
     # ya que pueden contener datos acerca del suceso o evento ocurrido, de los protagonistas así
     # como de la localización donde se produjo.
 
-    entidades = [ents.text for ents in doc.ents if ents.label_ != 'MISC' ]
+    entidades = [ents.text.strip() for ents in doc.ents if ents.label_ != 'MISC']
     print(f'DOCUMENTO Nº {count} en español con {len(entidades)} entidades, siendo únicas {len(set(entidades))}')
 
     text_esp.append(entidades)
-    entidades_join = ' '.join(entidades)
 
 print(text_esp)
 
@@ -317,27 +320,40 @@ for count, doc in enumerate(docs_en, start=1):
     # Como vimos anteriormente las diferentes categorías gramaticales proporcionan distinta cantidad
     # de información siendo los Nombres propios y sustantivos los que mayor cantidad de información aportan
     # también los verbos y los adjetivo.
+
     # Al no poder mejorar la métrica de la agrupación se escogen los Nombres propios, sustantivos y adjetivos
     # en esta fase ya que fueron los que mejorar la agrupación en el procesamiento de textos en español.
-    texto_en = [token.lemma_.strip() for token in doc if not token.is_punct and not token.is_stop
-     and (token.pos_ == 'NOUN' or token.pos_ == 'PROPN' or token.pos_ == 'ADJ')]
-    text_en.append(texto_en)
+
+    # texto_en = [token.lemma_.strip() for token in doc if not token.is_punct and not token.is_stop
+    #  and (token.pos_ == 'NOUN' or token.pos_ == 'PROPN' or token.pos_ == 'ADJ')]
+    # text_en.append(texto_en)
+
     # 4.6 WordCloud
     # Una manera de mostrar gráficamente que palabras son las más frecuentes en nuestros textos es
     # a través de las nubes de palabras las cuáles permiten observar si son los términos más informativos
     # los más frecuentes en nuestros documentos.
 
-    print(f'DOCUMENTO Nº {count} en inglés con {len(texto_en)} términos, siendo únicos {len(set(texto_en))}')
-    texto_en_join = ' '.join(texto_en)
+    # print(f'DOCUMENTO Nº {count} en inglés con {len(texto_en)} términos, siendo únicos {len(set(texto_en))}')
+    # texto_en_join = ' '.join(texto_en)
+    #
+    # wordcloud_en = WordCloud(max_words=70, background_color="white", width=500,
+    #            height=500,random_state=42).generate(texto_en_join)
+    #
+    # plt.figure(figsize=(30, 20))
+    # plt.axis("off")
+    # plt.imshow(wordcloud_en, interpolation='bilinear')
+    # #plt.show()
+    # wordcloud_en.to_file(f".\Texto-{count}english.png")
 
-    wordcloud_en = WordCloud(max_words=70, background_color="white", width=500,
-               height=500,random_state=42).generate(texto_en_join)
+    # 4.7 ENTIDADES NOMBRADAS
+    # Las E.N son importantes a la hora de aporta información sobre la tematica de una noticia
+    # ya que pueden contener datos acerca del suceso o evento ocurrido, de los protagonistas así
+    # como de la localización donde se produjo.
 
-    plt.figure(figsize=(30, 20))
-    plt.axis("off")
-    plt.imshow(wordcloud_en, interpolation='bilinear')
-    #plt.show()
-    wordcloud_en.to_file(f".\Texto-{count}english.png")
+    entidades = [ents.text.strip() for ents in doc.ents if not ents.text.isspace()]
+    print(f'DOCUMENTO Nº {count} en inglés cuenta con {len(entidades)} entidades, siendo únicas {len(set(entidades))}')
+
+    text_en.append(entidades)
 
 print(text_en)
 
