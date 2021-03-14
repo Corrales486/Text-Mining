@@ -350,7 +350,8 @@ for count, doc in enumerate(docs_en, start=1):
     # ya que pueden contener datos acerca del suceso o evento ocurrido, de los protagonistas así
     # como de la localización donde se produjo.
 
-    entidades = [ents.text.strip() for ents in doc.ents if not ents.text.isspace()]
+    entidades = [ents.text.strip() for ents in doc.ents if not ents.text.isspace() and (ents.label_ == 'PERSON'
+                                or ents.label_ == 'ORG' or ents.label_ == 'GPE' or ents.label_ == 'LOC')]
     #print(f'DOCUMENTO Nº {count} en inglés cuenta con {len(entidades)} entidades, siendo únicas {len(set(entidades))}')
 
     text_en.append(entidades)
