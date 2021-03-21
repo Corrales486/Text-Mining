@@ -43,15 +43,17 @@ if __name__ == "__main__":
             # Ya que introducía como EN saltos de linea (\n) o \t
             # Por ello se deciden eliminar para evitar ruido.
             f.close()
-# Evaluamos el idioma de cada texto y se añade a cada lista según se identifique.
-# También visualizamos los textos para entender su estructura y su temática.
-
+            # Evaluamos el idioma de cada texto y se añade a cada lista según se identifique.
+            # Se utiliza excepciones de Python por si la librería Textblob no funciona o da fallo
+            # utilizar la librería google translator
             try:
                 text_det = TextBlob(raw)
                 if text_det.detect_language() == 'en':
                     #print(f'Texto número {count}\n{raw}')
+                    print((text_det.detect_language(), url))
                     t_en.append(raw)
                 if text_det.detect_language() == 'es':
+                    print((text_det.detect_language(), url))
                     t_esp.append(raw)
                     #print(f'Texto número {count}\n{raw}')
             except ValueError:
@@ -62,12 +64,10 @@ if __name__ == "__main__":
                     detect_result = detector.detect(raw)
                     if detect_result[0] == 'en':
                         print('Ingles:', url)
-                        # if text_det.detect_language() == 'en':
                         # print(f'Texto número {count}\n{raw}')
                         t_en.append(raw)
                     elif detect_result[0] == 'es':
                         print('Español:', url)
-                        # if text_det.detect_language() == 'es':
                         t_esp.append(raw)
                 except TypeError:
                     if count == 2:
@@ -86,11 +86,6 @@ if __name__ == "__main__":
     print("Podemos acceder a los textos en español t_esp[0] - t_esp[" + str(len(t_esp) - 1) + "]")
     print("They can be accessed using t_en[0] - t_en[" + str(len(t_en) - 1) + "]")
 
-def translate(text):
-    lang = "en"
-    t = google_translator(timeout=5)
-    translate_text = t.translate(text.strip(), lang)
-    return translate_text
 
 # 3. PROCESAMIENTOS TEXTOS EN ESPAÑOL.
 # Se utilizan las funciones originales del código para calcular el TF así como realizar el clustering.
@@ -486,7 +481,6 @@ print("Reference total: ", reference)
 
 # Evaluation
 print("Rand_score total: ", adjusted_rand_score(reference,test))
-
 
 
 
