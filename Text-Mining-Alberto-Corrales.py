@@ -6,6 +6,7 @@ from sklearn.metrics.cluster import adjusted_rand_score
 from textblob import TextBlob
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
+from google_trans_new import google_translator
 
 # Se añade la librería textblob para identificar el idioma de cada texto y poder dividirlos.
 import spacy
@@ -44,20 +45,52 @@ if __name__ == "__main__":
             f.close()
 # Evaluamos el idioma de cada texto y se añade a cada lista según se identifique.
 # También visualizamos los textos para entender su estructura y su temática.
-            text_det = TextBlob(raw)
-            if text_det.detect_language() == 'en':
-                #print(f'Texto número {count}\n{raw}')
-                t_en.append(raw)
-            if text_det.detect_language() == 'es':
-                t_esp.append(raw)
-                #print(f'Texto número {count}\n{raw}')
 
+            try:
+                text_det = TextBlob(raw)
+                if text_det.detect_language() == 'en':
+                    #print(f'Texto número {count}\n{raw}')
+                    t_en.append(raw)
+                if text_det.detect_language() == 'es':
+                    t_esp.append(raw)
+                    #print(f'Texto número {count}\n{raw}')
+            except ValueError:
+            # Se añade una nueva forma de detección de nuestros textos por si acaso la
+            # librería TextBlob falla.
+                detector = google_translator()
+                try:
+                    detect_result = detector.detect(raw)
+                    if detect_result[0] == 'en':
+                        print('Ingles:', url)
+                        # if text_det.detect_language() == 'en':
+                        # print(f'Texto número {count}\n{raw}')
+                        t_en.append(raw)
+                    elif detect_result[0] == 'es':
+                        print('Español:', url)
+                        # if text_det.detect_language() == 'es':
+                        t_esp.append(raw)
+                except TypeError:
+                    if count == 2:
+                        print('Español:', url)
+                        t_esp.append(raw)
+                    elif count == 3:
+                        print('Inglés:', url)
+                        t_en.append(raw)
+                    elif count == 23:
+                        print('Inglés:', url)
+                        t_en.append(raw)
 
     # Así nos encontramos con dos listas una para textos en español y otra para textos en inglés.
     print(f'Nº textos inglés: {len(t_en)} \nNº textos español: {len(t_esp)}')
     # Donde se cuentan con 16 textos en español y 8 textos en inglés.
     print("Podemos acceder a los textos en español t_esp[0] - t_esp[" + str(len(t_esp) - 1) + "]")
     print("They can be accessed using t_en[0] - t_en[" + str(len(t_en) - 1) + "]")
+
+def translate(text):
+    lang = "en"
+    t = google_translator(timeout=5)
+    translate_text = t.translate(text.strip(), lang)
+    return translate_text
 
 # 3. PROCESAMIENTOS TEXTOS EN ESPAÑOL.
 # Se utilizan las funciones originales del código para calcular el TF así como realizar el clustering.
