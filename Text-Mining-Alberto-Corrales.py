@@ -1,7 +1,9 @@
 import re, pprint, os, numpy
 import nltk
+import pandas as pd
 from sklearn.metrics.cluster import *
 from sklearn.cluster import AgglomerativeClustering
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.cluster import adjusted_rand_score
 from textblob import TextBlob
 from wordcloud import WordCloud
@@ -87,6 +89,9 @@ if __name__ == "__main__":
     print("They can be accessed using t_en[0] - t_en[" + str(len(t_en) - 1) + "]")
 
 
+def identity_tokenizer(text):
+    return text
+
 # 3. PROCESAMIENTOS TEXTOS EN ESPAÑOL.
 # Se utilizan las funciones originales del código para calcular el TF así como realizar el clustering.
 
@@ -99,23 +104,21 @@ def cluster_texts_es(texts, clustersNumber, distance):
     unique_terms = list(set(collection))
     print("Términos únicos textos en español: ", len(unique_terms))
 
-    ### And here we actually call the function and create our array of vectors.
-    vectors = [numpy.array(TF(f,unique_terms, collection)) for f in texts]
-    print("Vectores creados.")
+    tfidf = TfidfVectorizer(analyzer='word', tokenizer=identity_tokenizer, lowercase=False)
+    # Realizamos los vectores con los términos únicos de nuestros textos
+    # Creados directamente con Tfidf
+    vectors = tfidf.fit_transform(texts)
+    vectors_dense = vectors.todense()
+    print(pd.DataFrame(vectors_dense, columns=tfidf.vocabulary_))
+    # Se crean 16 vectores (uno por cada texto en español) y cado uno de ellos con 194
+    # palabras correspondientes a los términos únicos de nuestros textos.
+    print("Vectors created.")
 
     clusterer = AgglomerativeClustering(n_clusters=clustersNumber, linkage="average", affinity=distanceFunction)
-    clusters = clusterer.fit_predict(vectors)
+    clusters = clusterer.fit_predict(vectors_dense)
 
     return clusters
 
-# Function to create a TF vector for one document. For each of
-# our unique words, we have a feature which is the tf for that word
-# in the current document
-def TF(document, unique_terms, collection):
-    word_tf = []
-    for word in unique_terms:
-        word_tf.append(collection.tf(word, document))
-    return word_tf
 
 # 3.1.1 TOKENIZACIÓN ERRÓNEA
 # Spacy permite modificar y añadir nuevos conjuntos de reglas a las ya existentes.
@@ -267,7 +270,6 @@ print("Rand_score español: ", adjusted_rand_score(reference_esp,test_esp))
 
 # 4. PROCESAMIENTO TEXTOS INGLÉS
 # Contamos con 8 textos en inglés los cuáles están almacenados en t_en
-# Se siguen utilizando las funciones originales del código para calcular el TF así como realizar el clustering.
 
 def cluster_texts_en(texts, clustersNumber, distance):
     #Load the list of texts into a TextCollection object.
@@ -278,24 +280,22 @@ def cluster_texts_en(texts, clustersNumber, distance):
     unique_terms = list(set(collection))
     print("Unique terms found: ", len(unique_terms))
 
-    ### And here we actually call the function and create our array of vectors.
-    vectors = [numpy.array(TF(f,unique_terms, collection)) for f in texts]
+    tfidf = TfidfVectorizer(analyzer='word', tokenizer=identity_tokenizer, lowercase=False)
+    # Realizamos los vectores con los términos únicos de nuestros textos
+    # Creados directamente con Tfidf
+    vectors = tfidf.fit_transform(texts)
+    vectors_dense = vectors.todense()
+    print(pd.DataFrame(vectors_dense, columns=tfidf.vocabulary_))
+    # Se crean 8 vectores (uno por cada texto en inglés) cado uno de ellos con 166 palabras
+    # correspondientes a los términos únicos.
     print("Vectors created.")
 
     # initialize the clusterer
     clusterer = AgglomerativeClustering(n_clusters=clustersNumber, linkage="average", affinity=distanceFunction)
-    clusters = clusterer.fit_predict(vectors)
+    clusters = clusterer.fit_predict(vectors_dense)
 
     return clusters
 
-# Function to create a TF vector for one document. For each of
-# our unique words, we have a feature which is the tf for that word
-# in the current document
-def TF(document, unique_terms, collection):
-    word_tf = []
-    for word in unique_terms:
-        word_tf.append(collection.tf(word, document))
-    return word_tf
 
 # 4.1.1 TOKENIZACIÓN MODIFICADA INGLÉS
 # Spacy permite modificar y añadir nuevos conjuntos de reglas a las ya existentes.
@@ -423,25 +423,22 @@ def cluster_texts(texts, clustersNumber, distance):
     unique_terms = list(set(collection))
     print("Unique terms (All texts) found: ", len(unique_terms))
 
-    ### And here we actually call the function and create our array of vectors.
-    vectors = [numpy.array(TF(f,unique_terms, collection)) for f in texts]
+    tfidf = TfidfVectorizer(analyzer='word', tokenizer=identity_tokenizer, lowercase=False)
+    # Realizamos los vectores con los términos únicos de nuestros textos
+    # Creados directamente con Tfidf
+    vectors = tfidf.fit_transform(texts)
+    vectors_dense = vectors.todense()
+    print(pd.DataFrame(vectors_dense, columns=tfidf.vocabulary_))
+    # Se crean 24 vectores (uno por cada texto) cado uno de ellos con 349 palabras
+    # correspondientes a los términos únicos.
     print("Vectors created.")
 
     # initialize the clusterer
     clusterer = AgglomerativeClustering(n_clusters=clustersNumber,
                                       linkage="average", affinity=distanceFunction)
-    clusters = clusterer.fit_predict(vectors)
+    clusters = clusterer.fit_predict(vectors_dense)
 
     return clusters
-
-# Function to create a TF vector for one document. For each of
-# our unique words, we have a feature which is the tf for that word
-# in the current document
-def TF(document, unique_terms, collection):
-    word_tf = []
-    for word in unique_terms:
-        word_tf.append(collection.tf(word, document))
-    return word_tf
 
 
 distanceFunction ="cosine"
@@ -481,9 +478,3 @@ print("Reference total: ", reference)
 
 # Evaluation
 print("Rand_score total: ", adjusted_rand_score(reference,test))
-
-
-
-
-
-
